@@ -1,2 +1,3 @@
-web-services-venv
-.idea
+web-services-venv/
+.idea/
+__pycache/
