@@ -44,6 +44,9 @@ class Attraction(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     discounts = models.ManyToManyField(Discount)
 
+    def natural_key(self):
+        return f"{self.name}"
+
     def __str__(self):
         return f"{self.name} {self.category} {self.price} {self.description} {self.address} {self.country}"
 
@@ -52,15 +55,18 @@ class Tour(models.Model):
     name = models.CharField('Tour name', max_length=250)
     duration = models.IntegerField('Tour Duration (days)')
     price = models.IntegerField('Tour price')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
     attractions = models.ManyToManyField(Attraction)
 
     def __str__(self):
-        return f"{self.name} {self.duration} {self.price} {self.attractions}"
+        return f"{self.name} {self.country} {self.duration} {self.price} {self.attractions}"
 
 
 class Booking(models.Model):
     tour_or_attraction_id = models.CharField('Tour(T) or attraction(A) id', max_length=100, null=True, blank=True)
     price = models.IntegerField('Booking price')
+    psp_checkout_id = models.IntegerField('Transaction ID')
+    psp_id = models.IntegerField('PSP ID')
     start_date = models.DateTimeField('Booking start data')
     adults_no = models.IntegerField('Number of adults', null=True, blank=True)
     kids_no = models.IntegerField('Number of kids', null=True, blank=True)
