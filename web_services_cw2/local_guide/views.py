@@ -209,16 +209,15 @@ def get_countries(request):
 @csrf_exempt
 def book(request):
     if request.method == 'POST':
-        print(request.POST)
-        # tour_attraction_id = request.POST.get('tour_attraction_id', None)
-        tour_attraction_id = request.POST['tour_attraction_id']
-        print(tour_attraction_id)
-        psp_id = request.POST['psp_id']
-        psp_checkout_id = request.POST['psp_checkout_id']
-        start_date = request.POST['start_date']
-        adults_no = request.POST['adults_no']
-        kids_no = request.POST['kids_no']
-        seniors_no = request.POST['seniors_no']
+        # print(json.loads(request.body))
+        incoming_booking_json = json.loads(request.body)
+        tour_attraction_id = incoming_booking_json['tour_attraction_id']
+        psp_id = incoming_booking_json['psp_id']
+        psp_checkout_id = incoming_booking_json['psp_checkout_id']
+        start_date = incoming_booking_json['start_date']
+        adults_no = incoming_booking_json['adults_no'] if 'adults_no' in incoming_booking_json else 0
+        kids_no = incoming_booking_json['kids_no'] if 'kids_no' in incoming_booking_json else 0
+        seniors_no = incoming_booking_json['seniors_no'] if 'seniors_no' in incoming_booking_json else 0
 
         # checking if any of the required parameters is NoneType
         if len([x for x in [tour_attraction_id, psp_id, psp_checkout_id, start_date] if x is None]) > 0:
@@ -244,6 +243,13 @@ def book(request):
                 tour = Tour.objects.get(pk=tour_id)
                 booking_dict['tour_attraction_id'] = int(tour_attraction_id)
 
+                # calculating price (all adults_no, seniors_no and kids_no are 0 then return base price which is per one, adult person)
+                booking_dict['price'] = 0
+                if len([x for x in [adults_no, seniors_no, kids_no] if x == 0]) == 3:
+                    booking_dict['price'] = tour.price
+                else:
+                    booking_dict['price'] = calculate_total_price(tour.price, adults_no, kids_no, seniors_no)
+
             except ObjectDoesNotExist:
                 error_msg = create_json_error_msg(('There is no tour with id: ' + str(tour_id)))
                 return HttpResponse(error_msg, status=400)
@@ -255,6 +261,13 @@ def book(request):
             try:
                 attraction = Attraction.objects.get(pk=attraction_id)
                 booking_dict['tour_attraction_id'] = tour_attraction_id
+
+                # calculating price (all adults_no, seniors_no and kids_no are 0 then return base price which is per one, adult person)
+                booking_dict['price'] = 0
+                if len([x for x in [adults_no, seniors_no, kids_no] if x == 0]) == 3:
+                    booking_dict['price'] = attraction.price
+                else:
+                    booking_dict['price'] = calculate_total_price(attraction.price, adults_no, kids_no, seniors_no)
 
             except ObjectDoesNotExist:
                 error_msg = create_json_error_msg(('There is no tour with id: ' + str(attraction_id)))
@@ -280,16 +293,15 @@ def book(request):
 
         # if status code is not equal 200
         print('STATUS CODE FROM PSP: ', str(psp_checkout_status_code))
-        # if psp_checkout_status_code != 200:
-        #     return HttpResponse(("Incorrect psp_checkout_id: " + str(psp_checkout_id)), status=400)
-        # else:
-        booking_dict['psp_id'] = psp_id
-        booking_dict['psp_checkout_id'] = psp_checkout_id
+        if psp_checkout_status_code != 200:
+            return HttpResponse(("Incorrect psp_checkout_id: " + str(psp_checkout_id)), status=400)
+        else:
+            booking_dict['psp_id'] = psp_id
+            booking_dict['psp_checkout_id'] = psp_checkout_id
 
         # parsing date
         print('START DATE: ', start_date)
         try:
-            # booking_start_date = datetime.strptime(start_date, '%d-%m-%YT%H:%M:%S.%f')
             booking_start_date = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S%z')
             booking_start_date = booking_start_date.isoformat()
             booking_dict['start_date'] = str(booking_start_date)
@@ -305,19 +317,19 @@ def book(request):
             booking_dict['kids_no'] = int(kids_no) if kids_no not in [None, ''] else 0
             booking_dict['seniors_no'] = int(seniors_no) if seniors_no not in [None, ''] else 0
 
-            # calculating
 
         # adding booking to the database
-        # new_booking = Booking.objects.create(
-        #     price=,
-        #     start_date=,
-        #     adults_no=,
-        #     kids_no,
-        #     seniors_no,
-        #     tour_attraction_id,
-        #     psp_id,
-        #     psp_checkout_id
-        # )
+        new_booking = Booking.objects.create(
+            price=booking_dict['price'],
+            start_date=booking_dict['start_date'],
+            adults_no=booking_dict['adults_no'],
+            kids_no=booking_dict['kids_no'],
+            seniors_no=booking_dict['seniors_no'],
+            tour_or_attraction_id=booking_dict['tour_attraction_id'],
+            psp_id=booking_dict['psp_id'],
+            psp_checkout_id=booking_dict['psp_checkout_id']
+        )
+
         booking_dict['msg'] = 'Booked successfully'
         booking_json = json.dumps(booking_dict)
         return HttpResponse(booking_json, status=200)
@@ -330,9 +342,9 @@ def make_tour(request):
     if request.method == 'POST':
 
         # getting parameters
-        print(request.POST)
-        tour_name = request.POST['tour_name']
-        attractions_list_str = request.POST['attractions']
+        incoming_new_tour_json = json.loads(request.body)
+        tour_name = incoming_new_tour_json['tour_name']
+        attractions_list_str = incoming_new_tour_json['attractions']
 
         # parsing the attraction list
         attractions = attractions_list_str[1:-1].split(',')
