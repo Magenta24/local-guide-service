@@ -241,6 +241,35 @@ def get_tours_ids(request):
 
 
 @csrf_exempt
+def get_bookings(request):
+    if request.method == 'GET':
+
+        # getting all attractions from the database
+        bookings = Booking.objects.all()
+        bookings_dict = {'bookings': []}
+
+        for b in bookings:
+            bookings_dict['bookings'].append(
+                {
+                    'id': b.id,
+                    'price': b.price,
+                    'tour_or_attraction_id': b.tour_or_attraction_id,
+                    'psp_id': b.psp_id,
+                    'psp_checkout_id': b.psp_checkout_id,
+                    'adults_no': b.adults_no,
+                    'kids_no': b.kids_no,
+                    'seniors_no': b.seniors_no
+                }
+            )
+
+        bookings_json = json.dumps(bookings_dict)
+
+        return HttpResponse(bookings_json, content_type='application/json')
+    else:
+        return HttpResponse(status=405)
+
+
+@csrf_exempt
 def book(request):
     if request.method == 'POST':
         # print(json.loads(request.body))

@@ -12,5 +12,6 @@ urlpatterns = [
     path("api/book", views.book, name="book"),
     path("api/make_tour", views.make_tour, name="make_tour"),
     path("api/get_attraction_ids", views.get_attractions_ids, name="attractions_ids"),
-    path("api/get_tour_ids", views.get_tours_ids, name="tours_ids")
+    path("api/get_tour_ids", views.get_tours_ids, name="tours_ids"),
+    path("api/get_bookings", views.get_bookings, name="get_bookings")
 ]
