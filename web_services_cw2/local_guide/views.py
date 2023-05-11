@@ -306,11 +306,13 @@ def book(request):
             booking_dict['start_date'] = booking_start_date.isoformat()
         except Exception as e:
             print(e)
-            return HttpResponse('Incorrect datetime format.  Should be %Y-%m-%dT%H:%M:%S+%z', status=400)
+            error_msg = create_json_error_msg('Incorrect datetime format. It should be ISO format %Y-%m-%dT%H:%M:%S%f')
+            return HttpResponse(error_msg, status=400)
 
         # checking number of guests (if not 0)
         if len([x for x in [kids_no, seniors_no, adults_no] if x in [None, '']]) == 4:
-            return HttpResponse('The total number of guests cannot be 0!', status=400)
+            error_msg = create_json_error_msg('The total number of guests cannot be 0!')
+            return HttpResponse(error_msg, status=400)
         else:
             booking_dict['adults_no'] = int(adults_no) if adults_no not in [None, ''] else 0
             booking_dict['kids_no'] = int(kids_no) if kids_no not in [None, ''] else 0
