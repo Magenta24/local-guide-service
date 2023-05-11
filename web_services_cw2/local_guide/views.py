@@ -313,13 +313,13 @@ def book(request):
 
         # sending request to PSP to confirm the psp_checkout_id
         psp_checkout_status_code = None
-        if int(psp_id) == 1:
+        if int(psp_id) == 0:
             psp_checkout_status_code = requests.get(
                 "http://sc20cah.pythonanywhere.com/api/checkout/" + str(psp_checkout_id) + '/status').status_code
-        elif int(psp_id) == 2:
+        elif int(psp_id) == 1:
             psp_checkout_status_code = requests.get(
                 "http://sc20ap.pythonanywhere.com/api/checkout/" + str(psp_checkout_id) + '/status').status_code
-        elif int(psp_id) == 3:
+        elif int(psp_id) == 2:
             psp_checkout_status_code = requests.get(
                 "http://sc20sh.pythonanywhere.com/api/checkout/" + str(psp_checkout_id) + '/status').status_code
         else:
