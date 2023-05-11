@@ -205,6 +205,40 @@ def get_countries(request):
     else:
         return HttpResponse(status=405)
 
+@csrf_exempt
+def get_attractions_ids(request):
+    if request.method == 'GET':
+
+        # getting all attractions from the database
+        attractions = Attraction.objects.all()
+        attractions_ids_dict = {'attractions_ids': []}
+
+        for a in attractions:
+            attractions_ids_dict['attractions_ids'].append(a.id)
+
+        attractions_ids_json = json.dumps(attractions_ids_dict)
+
+        return HttpResponse(attractions_ids_json, content_type='application/json')
+    else:
+        return HttpResponse(status=405)
+
+@csrf_exempt
+def get_tours_ids(request):
+    if request.method == 'GET':
+
+        # getting all attractions from the database
+        tours = Tour.objects.all()
+        tours_ids_dict = {'tours_ids': []}
+
+        for t in tours:
+            tours_ids_dict['tours_ids'].append(t.id)
+
+        tours_ids_json = json.dumps(tours_ids_dict)
+
+        return HttpResponse(tours_ids_json, content_type='application/json')
+    else:
+        return HttpResponse(status=405)
+
 
 @csrf_exempt
 def book(request):

@@ -11,4 +11,6 @@ urlpatterns = [
     path("api/countries", views.get_countries, name="get_countries"),
     path("api/book", views.book, name="book"),
     path("api/make_tour", views.make_tour, name="make_tour"),
+    path("api/get_attraction_ids", views.get_attractions_ids, name="attractions_ids"),
+    path("api/get_tour_ids", views.get_tours_ids, name="tours_ids")
 ]
