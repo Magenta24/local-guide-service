@@ -236,12 +236,13 @@ def book(request):
 
         # parsing tour_attraction_id (if starts then 'T'-tour, if 'A' then single attraction)
         if tour_attraction_id.startswith('T'):
+
             tour_id = int(tour_attraction_id[1:])
 
             # check if there is such a tour
             try:
                 tour = Tour.objects.get(pk=tour_id)
-                booking_dict['tour_attraction_id'] = int(tour_attraction_id)
+                booking_dict['tour_attraction_id'] = tour_attraction_id
 
                 # calculating price (all adults_no, seniors_no and kids_no are 0 then return base price which is per one, adult person)
                 booking_dict['price'] = 0
@@ -300,11 +301,9 @@ def book(request):
             booking_dict['psp_checkout_id'] = psp_checkout_id
 
         # parsing date
-        print('START DATE: ', start_date)
         try:
-            booking_start_date = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S%z')
-            booking_start_date = booking_start_date.isoformat()
-            booking_dict['start_date'] = str(booking_start_date)
+            booking_start_date = datetime.fromisoformat(start_date)
+            booking_dict['start_date'] = booking_start_date.isoformat()
         except Exception as e:
             print(e)
             return HttpResponse('Incorrect datetime format.  Should be %Y-%m-%dT%H:%M:%S+%z', status=400)
