@@ -376,6 +376,12 @@ def book(request):
         try:
             booking_start_date = datetime.fromisoformat(start_date)
             booking_dict['start_date'] = booking_start_date.isoformat()
+
+            # check if the date is not in the past
+            if booking_dict['start_date'] < datetime.now().isoformat():
+                error_msg = create_json_error_msg('You cannot provide a date in the past')
+                return HttpResponse(error_msg, status=400)
+
         except Exception as e:
             print(e)
             error_msg = create_json_error_msg('Incorrect datetime format. It should be ISO format %Y-%m-%dT%H:%M:%S%f')
