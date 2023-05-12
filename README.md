@@ -3,7 +3,6 @@
 ## Local Guide Service
 
 ### Domain: [http://sc20jmt.pythonanywhere.com/](http://sc20jmt.pythonanywhere.com/)
-### GitLab: [http://sc20jmt.pythonanywhere.com/](http://sc20jmt.pythonanywhere.com/)
 
 ### Credential to access the admin account
 
