@@ -3,13 +3,14 @@
 ## Local Guide Service
 
 ### Domain: [http://sc20jmt.pythonanywhere.com/](http://sc20jmt.pythonanywhere.com/)
+### GitLab: [http://sc20jmt.pythonanywhere.com/](http://sc20jmt.pythonanywhere.com/)
 
 ### Credential to access the admin account
 
-|              |  |
-|--------------|----------|
-| **Username** | ammar       |
-| **Password** | ammar       |
+|              |            |
+|--------------|------------|
+| **Username** | ammar      |
+| **Password** | ammar12345 |
 
 ## Core Endpoints
 
@@ -20,12 +21,15 @@
 - All listed categories can be obtained by requesting */api/categories*
 - E.g. http://sc20jmt.pythonanywhere.com/api/attractions?location=Rivia&category=Natural
 
-| Parameter name | Required? | Value type |                Description                |
-|:--------------:|:---------:|:----------:|:-----------------------------------------:|
-|    location    |    No     |   String   | The country the attraction takes place in |
-|    category    |    No     |   String   |      The category of the attraction       |
-|   min_price    |    No     |    Int     |               Minimum price               |
-|   max_price    |    No     |    Int     |               Maximum price               |
+| Parameter name | Required? | Value type |          Description           |
+|:--------------:|:---------:|:----------:|:------------------------------:|
+|    location    |    No     |   String   |          Country name          |
+|    category    |    No     |   String   | The category of the attraction |
+|   min_price    |    No     |   Number   |         Minimum price          |
+|   max_price    |    No     |   Number   |         Maximum price          |
+|   adults_no    |    No     |   Number   |     Number of adult guests     |
+|    kids_no     |    No     |   Number   |      Number of kid guests      |
+|   seniors_no   |    No     |   Number   |    Number of senior guests     |
 
 --------------------------------------------
 
@@ -38,57 +42,82 @@
 |   Parameter name   | Required? | Value type |              Description              |
 |:------------------:|:---------:|:----------:|:-------------------------------------:|
 |      location      |    No     |   String   |  The country the tour takes place in  |
-|    duration_max    |    No     |    Int     | Maximum number of days the tour lasts |
-|     min_price      |    No     |    Int     |            Minimum price              |
-|     max_price      |    No     |    Int     |            Maximum  price             |
-| attractions_no_max |    No     |    Int     |     Maximum number of attractions     |
+|    duration_max    |    No     |   Number   | Maximum number of days the tour lasts |
+|     min_price      |    No     |   Number   |             Minimum price             |
+|     max_price      |    No     |   Number   |            Maximum  price             |
+| attractions_no_max |    No     |   Number   |     Maximum number of attractions     |
+|     adults_no      |    No     |   Number   |        Number of adult guests         |
+|      kids_no       |    No     |   Number   |         Number of kid guests          |
+|     seniors_no     |    No     |   Number   |        Number of senior guests        |
 
 --------------------------------------------
 
 ### /api/book
-
-- Booking an attraction/tour
-- Eg. http://sc20jmt.pythonanywhere.com/api/book?tour_attraction_ID=A2&psp_id=2&psp_checkout_id=2137&start_date=2005-04-0221:37:00.666666
-...
+- Request: method: POST
+- Purpose: Booking an attraction/tour
+- Response: JSON with the booking details
+- Incoming request body: JSON format
 
 |     Parameter name      | Required? | Value type |                                                               Description                                                                |
-|:-----------------------:|:---------:|:---------:|:----------------------------------------------------------------------------------------------------------------------------------------:|
-| tour_attraction_ID      |    Yes    |   String  | The *tour_attraction_ID* starts with *A* for booking a single attraction and with *T*. <br> e.g. *A2* (booking the attraction with ID=2) |
-|         psp_id          |    Yes    |    Int    |                                                               The PSP's ID                                                               |
-|     psp_checkout_id     |    Yes    |    Int    |                                                             Transaction's ID                                                             |
-|       start_date        |  Yes      | Datetime  |                                                       Tour/attraction's start date                                                       |
-|        adults_no        |    No     |    Int    |                                                         Number of adults guests                                                          |
-|         kids_no         |    No     |    Int    |                                                           Number of kid guests                                                           |
-|       seniors_no        |    No     |    Int    |                                                         Number of senior guests                                                          |
+|:-----------------------:|:---------:|:----------:|:----------------------------------------------------------------------------------------------------------------------------------------:|
+| tour_attraction_ID      |    Yes    |   String   | The *tour_attraction_ID* starts with *A* for booking a single attraction and with *T*. <br> e.g. *A2* (booking the attraction with ID=2) |
+|         psp_id          |    Yes    |   Number   |                                                               The PSP's ID                                                               |
+|     psp_checkout_id     |    Yes    |   Number   |                                                             Transaction's ID                                                             |
+|       start_date        |    Yes    |  Datetime  |                                      Tour/attraction's start date in ISO format (e.g. 2024-05-11T13:35:48.123456)                                       |
+|        adults_no        |    No     |   Number   |                                                         Number of adults guests                                                          |
+|         kids_no         |    No     |   Number   |                                                           Number of kid guests                                                           |
+|       seniors_no        |    No     |   Number   |                                                         Number of senior guests                                                          |
 
 --------------------------------------------
 
 ### /api/make_tour
-- Creating a new tour from existing attractions providing IDs of attractions in a list
-- E.g. http://sc20jmt.pythonanywhere.com/api/make_tour?attractions=[1,2,4]
+- Request: method: POST
+- Purpose: Creating a custom tour from already existing attractions
+- Response: JSON with the new tour’s details
+- Incoming request body: JSON format
+
+| Parameter name | Required? | Value type |                Description                |
+|:--------------:|:---------:|:----------:|:-----------------------------------------:|
+|   tour_name    |    Yes    |   String   |              New tour's name              |
+|  attractions   |    Yes    |   Array    | List of attraction to include in new tour |
 
 --------------------------------------------
 ## Additional Endpoints
 ### /api/categories
 - listing all categories
+- Response: JSON
 
 --------------------------------------------
 ### /api/discounts
 - listing all discounts
+- - Response: JSON
 
 --------------------------------------------
 ### /api/bookings
 - listing all bookings
+- Response: JSON
 
 --------------------------------------------
-### /api/add_attraction
-- adding a new attraction to the database
+### /api/countries
+- listing all countries
+- Response: JSON
 
 --------------------------------------------
-```
-cd existing_repo
-git remote add origin https://gitlab.com/Calanthe/web-services-cw2.git
-git branch -M main
-git push -uf origin main
-```
 
+## Running
+### Create Python environment
+```
+python -m venv /path/to/new/env/venv_name
+```
+### Activate
+```
+./path/to/new/env/venv_name/bin/activate # activate the environment
+```
+### Install requirements (Django and Requests)
+```
+pip install -r requirements.txt
+```
+### Run the Django server
+```
+python .\web_services_cw2\manage.py runserver 
+```
