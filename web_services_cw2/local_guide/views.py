@@ -417,7 +417,7 @@ def make_tour(request):
         incoming_new_tour_json = json.loads(request.body)
 
         # new tour dictionary
-        new_tour = {
+        new_tour_dict = {
             'id': None,
             'name': incoming_new_tour_json['tour_name'],
             'duration': len(incoming_new_tour_json['attractions']),
@@ -435,24 +435,24 @@ def make_tour(request):
 
                 attraction = Attraction.objects.get(pk=int(a))  # get the attraction of ID a
                 tour_attractions.append(attraction)  # tour's attractions
-                new_tour['price'] += attraction.price  # add attraction's price to tour's price
-                new_tour['attractions'].append(attraction.name)
+                new_tour_dict['price'] += attraction.price  # add attraction's price to tour's price
+                new_tour_dict['attractions'].append(attraction.name)
 
                 if counter == 0:
-                    new_tour['country'] = attraction.country  # set the tour's country
+                    new_tour_dict['country'] = attraction.country  # set the tour's country
 
             except ObjectDoesNotExist as e:
                 return HttpResponse(("There is no attraction with ID: " + str(a)), status=400)
 
         # adding tour to the database
         try:
-            new_tour = Tour.objects.create(name=new_tour['name'],
-                                           duration=new_tour['duration'],
-                                           price=new_tour['price'],
-                                           country=new_tour['country'],
-                                           attractions_no=new_tour['attractions_no'])
+            new_tour = Tour.objects.create(name=new_tour_dict['name'],
+                                           duration=new_tour_dict['duration'],
+                                           price=new_tour_dict['price'],
+                                           country=new_tour_dict['country'],
+                                           attractions_no=new_tour_dict['attractions_no'])
         except Exception as e:
-            error_msg = create_json_error_msg(('There is a tour with name: ' + new_tour['name']))
+            error_msg = create_json_error_msg(('There is a tour with name: ' + new_tour_dict['name']))
             return HttpResponse(error_msg, status=400)
 
         # adding attractions of the tour to database
@@ -463,9 +463,9 @@ def make_tour(request):
         new_tour.save()
 
         # return JSON
-        new_tour['id'] = new_tour.id
-        new_tour['country'] = new_tour['country'].name
-        new_tour_json = json.dumps(new_tour)
+        new_tour_dict['id'] = new_tour.id
+        new_tour_dict['country'] = new_tour.country.name
+        new_tour_json = json.dumps(new_tour_dict)
 
         return HttpResponse(new_tour_json, content_type='application/json')
     else:
