@@ -4,13 +4,6 @@
 
 ### Domain: [http://sc20jmt.pythonanywhere.com/](http://sc20jmt.pythonanywhere.com/)
 
-### Credential to access the admin account
-
-|              |            |
-|--------------|------------|
-| **Username** | ammar      |
-| **Password** | ammar12345 |
-
 ## Core Endpoints
 
 ### /api/attractions
